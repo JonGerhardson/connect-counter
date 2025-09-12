@@ -15,28 +15,41 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      # 2. Sets up Python
+      # 2. --- NEW STEP ---
+      # Verify that the script exists at the expected path before doing anything else.
+      # If this step fails, the file is not in the correct location in the repo.
+      - name: Verify script file exists
+        run: |
+          if [ ! -f "connect-counter/check_cameras.py" ]; then
+            echo "::error::Script file not found at 'connect-counter/check_cameras.py'. Aborting workflow."
+            echo "Please ensure the file exists at this exact path in your repository."
+            exit 1
+          else
+            echo "Script file found. Proceeding with setup."
+          fi
+
+      # 3. Sets up Python (only runs if the check above passes)
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # 3. Installs dependencies
+      # 4. Installs dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install playwright
           playwright install
           
-      # 4. Install OS dependencies for Playwright (THE CRITICAL FIX)
+      # 5. Install OS dependencies for Playwright
       - name: Install Playwright browser dependencies
         run: playwright install-deps
 
-      # 5. Runs the script to update the CSV file (CORRECT PATH and NO REDIRECT)
+      # 6. Runs the script to update the CSV file
       - name: Run camera check script
         run: python connect-counter/check_cameras.py
 
-      # 6. Safely commits the updated CSV file
+      # 7. Safely commits the updated CSV file
       - name: Commit and push if there are changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:

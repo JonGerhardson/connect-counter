@@ -32,7 +32,7 @@ URLS = [
     'https://connectcollegepark.org/'
     'https://connectcharlotte.org/'
     'https://kpdconnect.org/'
-    '
+    
 ]
 
 # --- MODIFICATION ---

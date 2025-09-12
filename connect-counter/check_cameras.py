@@ -7,8 +7,41 @@ from playwright.sync_api import sync_playwright
 URLS = [
     'https://connectchicopee.org/',
     'https://connectlosangelescounty.org/'
+    'https://connectsanjose.org/'
+    'https://connectcleveland.org/'
+    'https://connect-stcloud-b4ab15b5.netlify.app/'
+    'https://connectwhitehall.org/'
+    'https://connectatlanta.org/'
+    'https://newyorkcityconnect.org'
+    'https://makenewarksafer.com/'
+    'https://connectbrownsville.org/'
+    'https://connectbaycounty.org/'
+    'https://connectdoralpd.com/'
+    'https://connectvirginiabeach.org/'
+    'https://connectduval.org/'
+    'https://keepsavannahsafe.org/'
+    'connectpaterson.org'
+    'https://connectmonroecountyny.org/'
+    'https://connectsetx.org/'
+    'https://connectsaratogasprings.org/'
+    'https://connectmonmouthcounty.org/'
+    'https://henrysafertogether.org/'
+    'https://connectgary.org/'
+    'https://keepkennesawsafe.org/'
+    'https://connectarlingtontx.org/'
+    'https://connectcollegepark.org/'
+    'https://connectcharlotte.org/'
+    'https://kpdconnect.org/'
+    '
 ]
-LOG_FILE = 'connect-counter.csv'
+
+# --- MODIFICATION ---
+# Get the directory where the script is located
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Create a path to the root of the repository (one level up) and define the log file name.
+# This makes the script more robust.
+LOG_FILE = os.path.join(SCRIPT_DIR, '..', 'connect-counter.csv')
+
 
 def get_camera_stats(url):
     """
@@ -55,7 +88,7 @@ def log_to_csv(timestamp, url, registered, integrated):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         # Write header only if the file is new
-        if not file_exists:
+        if not file_exists or os.path.getsize(LOG_FILE) == 0:
             writer.writeheader()
         
         # Write the data row

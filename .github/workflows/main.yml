@@ -30,8 +30,9 @@ jobs:
 
       # 4. Runs the script to update the CSV file
       - name: Run camera check script
-        # Correctly call the script in its subdirectory.
-        # Removed ">> connect-counter.csv" because the script handles writing to the file.
+        # This is the corrected line:
+        # - It points to the script inside the 'connect-counter' folder.
+        # - It REMOVES '>> connect-counter.csv'
         run: python connect-counter/check_cameras.py
 
       # 5. Safely commits the updated CSV file
@@ -39,6 +40,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Automated log: Update camera count"
-          # This now correctly points to the CSV in the root directory.
           file_pattern: connect-counter.csv
           branch: main
+

@@ -29,7 +29,10 @@ URLS = [
     'https://connectgary.org/'
     'https://keepkennesawsafe.org/'
     'https://connectarlingtontx.org/'
-    
+    'https://connectcollegepark.org/'
+    'https://connectcharlotte.org/'
+    'https://kpdconnect.org/'
+    '
 ]
 
 # --- MODIFICATION ---

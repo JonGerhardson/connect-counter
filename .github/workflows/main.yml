@@ -11,9 +11,12 @@ jobs:
     permissions:
       contents: write # This permission is required to push changes
     steps:
-      # 1. Checks out the repository
+      # 1. Checks out the repository and pulls the latest changes
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          # This is crucial for the auto-commit action to work correctly
+          fetch-depth: 0
 
       # 2. Sets up Python
       - name: Set up Python
@@ -28,15 +31,15 @@ jobs:
           pip install playwright
           playwright install
 
-      # 4. Installs the necessary OS dependencies for the browser
+      # 4. Installs the required system dependencies for Playwright browsers
       - name: Install Playwright browser dependencies
         run: playwright install-deps
 
-      # 5. Runs the script using the confirmed correct path
+      # 5. Runs the script from the correct, verified path
       - name: Run camera check script
         run: python connect-counter/check_cameras.py
 
-      # 6. Safely commits the updated CSV file if there are changes
+      # 6. Commits the updated CSV file if there are changes
       - name: Commit and push if there are changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:

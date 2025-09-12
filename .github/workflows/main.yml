@@ -9,51 +9,48 @@ jobs:
   check-and-commit:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # This permission is required to push changes
+      contents: write 
     steps:
       # 1. Checks out the repository
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          # This ensures the repo is checked out into a predictable directory
+          path: 'main'
 
-      # 2. --- NEW STEP ---
-      # Verify that the script exists at the expected path before doing anything else.
-      # If this step fails, the file is not in the correct location in the repo.
-      - name: Verify script file exists
-        run: |
-          if [ ! -f "connect-counter/check_cameras.py" ]; then
-            echo "::error::Script file not found at 'connect-counter/check_cameras.py'. Aborting workflow."
-            echo "Please ensure the file exists at this exact path in your repository."
-            exit 1
-          else
-            echo "Script file found. Proceeding with setup."
-          fi
+      # 2. --- CRITICAL DIAGNOSTIC STEP ---
+      # This will show us the exact file structure.
+      - name: Display repository file structure
+        run: ls -R
 
-      # 3. Sets up Python (only runs if the check above passes)
+      # 3. Sets up Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # 4. Installs dependencies
+      # 4. Installs all dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install playwright
           playwright install
-          
-      # 5. Install OS dependencies for Playwright
-      - name: Install Playwright browser dependencies
-        run: playwright install-deps
+          playwright install-deps
+        # Sets the working directory for the commands in this step
+        working-directory: ./main/connect-counter
 
-      # 6. Runs the script to update the CSV file
+      # 5. Runs the script to update the CSV file
       - name: Run camera check script
-        run: python connect-counter/check_cameras.py
+        # This step now runs from inside the nested directory
+        working-directory: ./main/connect-counter
+        run: python check_cameras.py
 
-      # 7. Safely commits the updated CSV file
+      # 6. Safely commits the updated CSV file
       - name: Commit and push if there are changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Automated log: Update camera count"
-          file_pattern: connect-counter.csv
+          # The file pattern is now relative to the repository root
+          file_pattern: main/connect-counter.csv
           branch: main
 

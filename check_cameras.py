@@ -7,6 +7,15 @@ from playwright.sync_api import sync_playwright
 URLS = [
     'https://connectchicopee.org/',
     'https://connectlosangelescounty.org/'
+    'https://connectsanjose.org/'
+    'https://connectcleveland.org/'
+    'https://connect-stcloud-b4ab15b5.netlify.app/'
+    'https://connectwhitehall.org/'
+    'https://connectatlanta.org/'
+    'https://newyorkcityconnect.org'
+    'https://makenewarksafer.com/'
+    'https://connectbrownsville.org/'
+    
 ]
 
 # --- MODIFICATION ---

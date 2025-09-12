@@ -28,12 +28,11 @@ jobs:
           pip install playwright
           playwright install
           
-      # 4. --- NEW STEP ---
-      # Install OS dependencies for Playwright browsers. This is the crucial fix.
+      # 4. Install OS dependencies for Playwright (THE CRITICAL FIX)
       - name: Install Playwright browser dependencies
         run: playwright install-deps
 
-      # 5. Runs the script to update the CSV file
+      # 5. Runs the script to update the CSV file (CORRECT PATH and NO REDIRECT)
       - name: Run camera check script
         run: python connect-counter/check_cameras.py
 

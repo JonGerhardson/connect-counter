@@ -27,12 +27,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install playwright
           playwright install
+          
+      # 4. --- NEW STEP ---
+      # Install OS dependencies for Playwright browsers. This is the crucial fix.
+      - name: Install Playwright browser dependencies
+        run: playwright install-deps
 
-      # 4. Runs the script to update the CSV file
+      # 5. Runs the script to update the CSV file
       - name: Run camera check script
         run: python connect-counter/check_cameras.py
 
-      # 5. Safely commits the updated CSV file
+      # 6. Safely commits the updated CSV file
       - name: Commit and push if there are changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:

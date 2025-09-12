@@ -30,9 +30,6 @@ jobs:
 
       # 4. Runs the script to update the CSV file
       - name: Run camera check script
-        # This is the corrected line:
-        # - It points to the script inside the 'connect-counter' folder.
-        # - It REMOVES '>> connect-counter.csv'
         run: python connect-counter/check_cameras.py
 
       # 5. Safely commits the updated CSV file

@@ -1,4 +1,4 @@
-name: 'Check Camera Count'
+name: 'Check Camera Count version 2.0'
 
 on:
   workflow_dispatch:

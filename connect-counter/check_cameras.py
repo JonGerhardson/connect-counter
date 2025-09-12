@@ -20,7 +20,7 @@ URLS = [
     'https://connectvirginiabeach.org/',
     'https://connectduval.org/',
     'https://keepsavannahsafe.org/',
-    'connectpaterson.org',
+    'https://connectpaterson.org',
     'https://connectmonroecountyny.org/',
     'https://connectsetx.org/',
     'https://connectsaratogasprings.org/',

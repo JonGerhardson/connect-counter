@@ -1,33 +1,46 @@
-name: 'File Structure Diagnostic'
+name: 'Check Camera Count'
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '5 3 * * *'
 
 jobs:
-  diagnose-structure:
+  check-and-commit:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # This permission is required to push changes
     steps:
-      # 1. Checks out the repository's code
+      # 1. Checks out the repository
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      # 2. This step will show us the exact location of all your files
-      - name: Show Current Directory and List All Files
-        run: |
-          echo "The current working directory is:"
-          pwd
-          echo "-------------------------------------------"
-          echo "Listing all files and directories found:"
-          ls -laR
-          echo "-------------------------------------------"
+      # 2. Sets up Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-      # 3. This step will test for the python script's location and tell us the result
-      - name: Attempt to locate the python script
+      # 3. Installs Python packages for the script
+      - name: Install Python dependencies
         run: |
-          if [ -f "connect-counter/check_cameras.py" ]; then
-            echo "SUCCESS: Found the script at 'connect-counter/check_cameras.py'"
-          else
-            echo "::error::FAILURE: Could NOT find the script at 'connect-counter/check_cameras.py'"
-            exit 1
-          fi
+          python -m pip install --upgrade pip
+          pip install playwright
+          playwright install
+
+      # 4. Installs the necessary OS dependencies for the browser
+      - name: Install Playwright browser dependencies
+        run: playwright install-deps
+
+      # 5. Runs the script using the confirmed correct path
+      - name: Run camera check script
+        run: python connect-counter/check_cameras.py
+
+      # 6. Safely commits the updated CSV file if there are changes
+      - name: Commit and push if there are changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Automated log: Update camera count"
+          file_pattern: connect-counter.csv
+          branch: main
 

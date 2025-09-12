@@ -15,6 +15,20 @@ URLS = [
     'https://newyorkcityconnect.org'
     'https://makenewarksafer.com/'
     'https://connectbrownsville.org/'
+    'https://connectbaycounty.org/'
+    'https://connectdoralpd.com/'
+    'https://connectvirginiabeach.org/'
+    'https://connectduval.org/'
+    'https://keepsavannahsafe.org/'
+    'connectpaterson.org'
+    'https://connectmonroecountyny.org/'
+    'https://connectsetx.org/'
+    'https://connectsaratogasprings.org/'
+    'https://connectmonmouthcounty.org/'
+    'https://henrysafertogether.org/'
+    'https://connectgary.org/'
+    'https://keepkennesawsafe.org/'
+    'https://connectarlingtontx.org/'
     
 ]
 

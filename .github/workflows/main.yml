@@ -1,56 +1,33 @@
-name: 'Check Camera Count'
+name: 'File Structure Diagnostic'
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '5 3 * * *'
 
 jobs:
-  check-and-commit:
+  diagnose-structure:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write 
     steps:
-      # 1. Checks out the repository
+      # 1. Checks out the repository's code
       - name: Checkout Repo
         uses: actions/checkout@v4
-        with:
-          # This ensures the repo is checked out into a predictable directory
-          path: 'main'
 
-      # 2. --- CRITICAL DIAGNOSTIC STEP ---
-      # This will show us the exact file structure.
-      - name: Display repository file structure
-        run: ls -R
-
-      # 3. Sets up Python
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      # 4. Installs all dependencies
-      - name: Install dependencies
+      # 2. This step will show us the exact location of all your files
+      - name: Show Current Directory and List All Files
         run: |
-          python -m pip install --upgrade pip
-          pip install playwright
-          playwright install
-          playwright install-deps
-        # Sets the working directory for the commands in this step
-        working-directory: ./main/connect-counter
+          echo "The current working directory is:"
+          pwd
+          echo "-------------------------------------------"
+          echo "Listing all files and directories found:"
+          ls -laR
+          echo "-------------------------------------------"
 
-      # 5. Runs the script to update the CSV file
-      - name: Run camera check script
-        # This step now runs from inside the nested directory
-        working-directory: ./main/connect-counter
-        run: python check_cameras.py
-
-      # 6. Safely commits the updated CSV file
-      - name: Commit and push if there are changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Automated log: Update camera count"
-          # The file pattern is now relative to the repository root
-          file_pattern: main/connect-counter.csv
-          branch: main
+      # 3. This step will test for the python script's location and tell us the result
+      - name: Attempt to locate the python script
+        run: |
+          if [ -f "connect-counter/check_cameras.py" ]; then
+            echo "SUCCESS: Found the script at 'connect-counter/check_cameras.py'"
+          else
+            echo "::error::FAILURE: Could NOT find the script at 'connect-counter/check_cameras.py'"
+            exit 1
+          fi
 

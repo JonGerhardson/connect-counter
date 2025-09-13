@@ -2,6 +2,7 @@ import datetime
 import csv
 import os
 from playwright.sync_api import sync_playwright
+from concurrent.futures import ThreadPoolExecutor
 
 # Define the target URLs as a list
 URLS = [
@@ -186,7 +187,6 @@ URLS = [
     'https://westsacsafeandsecure.org/',
 ]
 
-# --- MODIFICATION ---
 # Get the directory where the script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Create a path to the root of the repository (one level up) and define the log file name.
@@ -201,23 +201,30 @@ def get_camera_stats(url):
     with sync_playwright() as p:
         browser = p.chromium.launch()
         page = browser.new_page()
+        
+        registered_cameras = 'Not Found'
+        integrated_cameras = 'Not Found'
 
         try:
             # Go to the target URL passed as an argument
             page.goto(url, timeout=60000)
 
-            # Wait for a key element to ensure the page is loaded
-            page.wait_for_selector('p:text("Registered Cameras")', timeout=30000)
-
             # Wait for 5 seconds to allow "count-up" animations to finish
             page.wait_for_timeout(5000)
 
-            # Scrape the data
-            registered_text_element = page.locator('p:text("Registered Cameras")')
-            registered_cameras = registered_text_element.locator('xpath=preceding-sibling::p[1]').inner_text()
+            # Scrape the data for "Registered Cameras" if the element is visible
+            registered_text_element = page.locator('p:text("Registered Cameras")').first
+            if registered_text_element.is_visible():
+                registered_cameras = registered_text_element.locator('xpath=preceding-sibling::p[1]').inner_text()
+            else:
+                print(f"No 'Registered Cameras' element found for {url}")
 
-            integrated_text_element = page.locator('p:text("Integrated Cameras")')
-            integrated_cameras = integrated_text_element.locator('xpath=preceding-sibling::p[1]').inner_text()
+            # Scrape the data for "Integrated Cameras" if the element is visible
+            integrated_text_element = page.locator('p:text("Integrated Cameras")').first
+            if integrated_text_element.is_visible():
+                integrated_cameras = integrated_text_element.locator('xpath=preceding-sibling::p[1]').inner_text()
+            else:
+                print(f"No 'Integrated Cameras' element found for {url}")
 
             browser.close()
             return registered_cameras, integrated_cameras
@@ -226,7 +233,7 @@ def get_camera_stats(url):
             browser.close()
             # Log the error to the console
             print(f"An error occurred while scraping {url}: {e}")
-            return None, None
+            return 'Error', 'Error'
 
 def log_to_csv(timestamp, url, registered, integrated):
     """Appends a new row to the CSV log file."""
@@ -250,23 +257,24 @@ def log_to_csv(timestamp, url, registered, integrated):
         })
 
 if __name__ == "__main__":
-    # Loop through each URL in the list
-    for url in URLS:
-        print(f"Scraping data from: {url}")
+    # Use a thread pool to process URLs in parallel.
+    # The ideal number of workers can be adjusted based on system resources.
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        # Use executor.map to apply the get_camera_stats function to each URL
+        results = executor.map(get_camera_stats, URLS)
 
-        # Get the stats for the current URL
-        registered_count, integrated_count = get_camera_stats(url)
+        # Process the results as they become available
+        for url, (registered_count, integrated_count) in zip(URLS, results):
+            # Get the current timestamp
+            now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Get the current timestamp
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            if registered_count != 'Error' and integrated_count != 'Error':
+                # Log the successful data retrieval
+                log_to_csv(now, url, registered_count, integrated_count)
+                print(f"{now} - Successfully logged data for {url}: Registered={registered_count}, Integrated={integrated_count}")
+            else:
+                # Log the failure
+                log_to_csv(now, url, 'Error', 'Error')
+                print(f"{now} - Error: Failed to retrieve camera statistics for {url}. Logged error to CSV.")
 
-        if registered_count and integrated_count:
-            # Log the successful data retrieval
-            log_to_csv(now, url, registered_count, integrated_count)
-            print(f"{now} - Successfully logged data for {url}: Registered={registered_count}, Integrated={integrated_count}")
-        else:
-            # Log the failure
-            log_to_csv(now, url, 'Error', 'Error')
-            print(f"{now} - Error: Failed to retrieve camera statistics for {url}. Logged error to CSV.")
-
-        print("-" * 20) # Separator for clarity in console output
+            print("-" * 20) # Separator for clarity in console output

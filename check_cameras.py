@@ -2,191 +2,144 @@ import datetime
 import csv
 import os
 from playwright.sync_api import sync_playwright
-from concurrent.futures import ThreadPoolExecutor
 
 # Define the target URLs as a list
 URLS = [
-    'https://amarilloconnect.org/',
-    'https://apopkaconnect.org/',
-    'https://beverlyhillsconnect.org/',
-    'https://bradentonconnect.org/',
-    'https://campbellpdconnect.org/',
-    'https://cameraconnectdc.org/',
-    'https://communityconnectseattle.org/',
-    'https://connect-stcloud-b4ab15b5.netlify.app/',
-    'https://connect.volusiasheriff.gov/',
-    'https://connect2memphis.org/',
-    'https://connect2shelbycounty.org/',
-    'https://connectacworth.org/',
-    'https://connectakron.org/',
-    'https://connectalbanyga.org/',
-    'https://connectalsip.org/',
-    'https://connectaltoona.org/',
-    'https://connectanaheim.org/',
-    'https://connectannearundel.org/',
-    'https://connectarlingtontx.org/',
-    'https://connectarlingtonheights.org/',
-    'https://connectatlanta.org/',
-    'https://connectaurora.org/',
-    'https://connectbaycounty.org/',
-    'https://connectbeaumonttx.org/',
-    'https://connectbensalem.org/',
-    'https://connectbernalillocounty.org/',
-    'https://connectbiloxi.org/',
-    'https://connectbirmingham.org/',
-    'https://connectbrazoscounty.org/',
-    'https://connectbrownsville.org/',
-    'https://connectcalcasieuparish.org/',
-    'https://connectcharlotte.org/',
-    'https://connectcharlottecounty.org/',
-    'https://connectchesterfield.org/',
-    'https://connectchicagoheights.org/',
     'https://connectchicopee.org/',
-    'https://connectcincinnati.org/',
-    'https://connectclaycountyso.org/',
-    'https://connectclayton.org/',
-    'https://connectcleveland.org/',
-    'https://connectcobbcounty.org/',
-    'https://connectcollegepark.org/',
-    'https://connectcolumbus.org/',
-    'https://connectdallas.org/',
-    'https://connectdekalbcounty.org/',
-    'https://connectdelraybeach.org/',
-    'https://connectdoralpd.com/',
-    'https://connectduval.org/',
-    'https://connectelizabeth.org/',
-    'https://connectescambia.org/',
-    'https://connectfairfaxcounty.org/',
-    'https://connectfarmington.org/',
-    'https://connectfayetteville.org/',
-    'https://connectflaglercounty.org/',
-    'https://connectforestpark.org/',
-    'https://connectfortwaltonbeach.org/',
-    'https://connectgary.org/',
-    'https://connectgreeley.org/',
-    'https://connectgreensboro.org/',
-    'https://connectguilfordcounty.org/',
-    'https://connecthamiltonco.org/',
-    'https://connecthartford.org/',
-    'https://connecthawthorne.org/',
-    'https://connecthennepincounty.org/',
-    'https://connecthighpoint.org/',
-    'https://connecthillsboroughcounty.org/',
-    'https://connecthoover.org/',
-    'https://connectillinoisstatepolice.org/',
-    'https://connectindianrivercounty.org/',
-    'https://connectirving.org/',
-    'https://connectkalamazoo.org/',
-    'https://connectkck.org/',
-    'https://connectkyle.org/',
-    'https://connectlakecounty.org/',
-    'https://connectlex.org/',
     'https://connectlosangelescounty.org/',
-    'https://connectlouisvillemetro.org/',
-    'https://connectmadison.org/',
-    'https://connectmanchester.org/',
-    'https://connectmanhattanbeach.org/',
-    'https://connectmetronashville.org/',
-    'https://connectmiamipd.org/',
-    'https://connectminneapolis.org/',
-    'https://connectmodesto.org/',
-    'https://connectmonmouthcounty.org/',
-    'https://connectmonroecountyny.org/',
-    'https://connectmontgomerycounty.org/',
-    'https://connectmooresville.org/',
-    'https://connectncpd.org/',
-    'https://connectnewhanoversheriff.org/',
-    'https://connectnewhaven.org/',
-    'https://connectnewportnews.org/',
-    'https://connectnewtoncounty.org/',
-    'https://connectnorfolk.org/',
-    'https://connectnorthlittlerock.org/',
-    'https://connectnorthport.org/',
-    'https://connectoakbrookterrace.org/',
-    'https://connectoaklawn.org/',
-    'https://connectokaloosacounty.org/',
-    'https://connectoklahomacity.org/',
-    'https://connectontario.org/',
-    'https://connectorangecountyca.org/',
-    'https://connectoxford.org/',
-    'https://connectpaterson.org/',
-    'https://connectpeachtreecorners.org/',
-    'https://connectpellcity.org/',
-    'https://connectpeoria.org/',
-    'https://connectpetersburg.org/',
-    'https://connectplacercounty.org/',
-    'https://connectplano.org/',
-    'https://connectplaqueminesparish.org/',
-    'https://connectportsmouthva.org/',
-    'https://connectpowdersprings.org/',
-    'https://connectprairievillage.org/',
-    'https://connectprincegeorgescounty.org/',
-    'https://connectrankincounty.org/',
-    'https://connectredondobeach.org/',
-    'https://connectreno.org/',
-    'https://connectrialto.org/',
-    'https://richmondconnect.org/',
-    'https://connectrocklin.org/',
-    'https://connectroyalbahamas.org/',
-    'https://connectsacramento.org/',
-    'https://connectsacramentocounty.org/',
-    'https://connectsalinas.org/',
-    'https://connectsandyspringsga.org/',
     'https://connectsanjose.org/',
-    'https://connectsaratogasprings.org/',
-    'https://connectseatpleasant.org/',
-    'https://connectseminolecounty.org/',
-    'https://connectsetx.org/',
-    'https://connectshawneecounty.org/',
-    'https://connectshreveport.org/',
-    'https://connectsmyrna.org/',
-    'https://connectsouthfulton.org/',
-    'https://connectspokanecounty.org/',
-    'https://connectstarkville.org/',
-    'https://connectstatesboro.org/',
-    'https://connectstjohns.org/',
-    'https://connectsumner.org/',
-    'https://connecttucson.org/',
-    'https://connecttupelopolice.org/',
-    'https://connectturlock.org/',
-    'https://connectvirginiabeach.org/',
-    'https://connectwheaton.org/',
+    'https://connectcleveland.org/',
+    'https://connect-stcloud-b4ab15b5.netlify.app/',
     'https://connectwhitehall.org/',
-    'https://connectwinstonsalem.org/',
-    'https://connectwintergarden.org/',
-    'https://connectwinterpark.org/',
-    'https://denvercommunityeyesoncrime.org/',
-    'https://gwinnettsafecommunities.org/',
-    'https://hammondbluenet.org/',
-    'https://henrysafertogether.org/',
-    'https://keepclermontsafe.org/',
-    'https://keepkennesawsafe.org/',
-    'https://keepsavannahsafe.org/',
-    'https://keepvirginiabeachsafe.org/',
-    'https://kpdconnect.org/',
-    'https://linktoledo.org/',
-    'https://maderacountysafe.com/',
+    'https://connectatlanta.org/',
+    'https://newyorkcityconnect.org',
     'https://makenewarksafer.com/',
-    'https://martinconnect.org/',
-    'https://martinconnectregistry.org/',
-    'https://mococonnect.org/',
-    'https://mpdstarwatch.org/',
-    'https://newyorkcityconnect.org/',
-    'https://oakdaleconnect.org/',
-    'https://pomonasafecommunities.org/',
-    'https://protectstbernard.com/',
+    'https://connectbrownsville.org/',
+    'https://connectbaycounty.org/',
+    'https://connectdoralpd.com/',
+    'https://connectvirginiabeach.org/',
+    'https://connectduval.org/',
+    'https://keepsavannahsafe.org/',
+    'https://connectpaterson.org',
+    'https://connectmonroecountyny.org/',
+    'https://connectsetx.org/',
+    'https://connectsaratogasprings.org/',
+    'https://connectmonmouthcounty.org/',
+    'https://henrysafertogether.org/',
+    'https://connectgary.org/',
+    'https://keepkennesawsafe.org/',
+    'https://connectarlingtontx.org/',
+    'https://connectcollegepark.org/',
+    'https://connectcharlotte.org/',
+    'https://kpdconnect.org/',
+    'https://connecthoover.org/',
+    'https://connectescambia.org/',
+    'https://connectnorthlittlerock.org/',
+    'https://connectminneapolis.org/',
+    'https://connectstjohns.org/',
+    'https://connect2shelbycounty.org/',
     'https://safecherokee.org/',
-    'https://safejacksontn.org/',
-    'https://safespartanburg.org/',
-    'https://safeguardtuscaloosa.org/',
-    'https://sanmateoconnect.org/',
-    'https://syncsouthbend.org/',
-    'https://syncspringfield.org/',
+    'https://connectfayetteville.org/',
+    'https://connectclayton.org/',
     'https://tinleyparkconnect.org/',
-    'https://togethercos.org/',
-    'https://westsacsafeandsecure.org/',
+    'https://connectpellcity.org/',
+    'connectnewtoncounty.org',
+    'https://connectreno.org/',
+    'https://connectmontgomerycounty.org/',
+    'https://keepvirginiabeachsafe.org/',
+    'https://connectpellcity.org/',
+    'https://connectbensalem.org/',
+    'https://connectarlingtonheights.org/',
+    'https://denvercommunityeyesoncrime.org/',
+    'https://connectnorfolk.org/',
+    'https://connectalsip.org/',
+    'https://connectprairievillage.org/',
+    'https://connectlouisvillemetro.org/',
+    'https://connectrocklin.org/',
+    'https://connectoxford.org/',
+    'https://richmondconnect.org/',
+    'https://connectacworth.org/',
+    'https://safeguardtuscaloosa.org/',
+    'https://apopkaconnect.org/',
+    'https://connectindianrivercounty.org/',
+    'https://connectfortwaltonbeach.org/',
+    'https://connectbernalillocounty.org/',
+    'https://connectgreensboro.org/',
+    'https://connectnewportnews.org/',
+    'https://connectalbanyga.org/',
+    'https://ontarioconnect.org/',
+    'https://connect.volusiasheriff.gov/',
+    'https://connectoakbrookterrace.org',
+    'https://connectrankincounty.org',
+    'https://connectbrazoscounty.org',
+    'https://connectcalcasieuparish.org',
+    'https://connectdoralpd.com',
+    'https://connectkck.org',
+    'https://hammondbluenet.org',
+    'https://mpdstarwatch.org',
+    'https://connectplacercounty.org',
+    'https://connectguilfordcounty.org',
+    'https://connectaurora.org',
+    'https://connecthighpoint.org',
+    'https://connectkyle.org',
+    'https://connectcharlottecounty.org',
+    'https://connectstarkville.org',
+    'https://pomonasafecommunities.org',
+    'https://connectseatpleasant.org',
+    'https://connectplano.org',
+    'https://connectbiloxi.org',
+    'https://connectgreeley.org',
+    'https://communityconnectseattle.org',
+    'https://connectpowdersprings.org',
+    'https://connectclaycountyso.org',
+    'https://connectpeoria.org',
+    'https://connectlosangelescounty.org',
+    'https://connectforestpark.org',
+    'https://connectmanhattanbeach.org',
+    'https://connectfarmington.org',
+    'https://connectbrownsville.org',
+    'https://connectturlock.org',
+    'https://connectchicagoheights.org',
+    'https://connecttucson.org',
+    'https://safejacksontn.org',
+    'https://connectaltoona.org',
+    'https://connectmooresville.org',
+    'https://connectshreveport.org',
+    'https://connectrialto.org',
+    'https://oakdaleconnect.org',
+    'https://maderacountysafe.com',
+    'https://connectdelraybeach.org',
+    'https://connectsumner.org',
+    'https://connectsaratogasprings.org',
+    'https://connectsacramentocounty.org',
+    'https://connectseminolecounty.org',
+    'https://connectnorthport.org',
+    'https://connectspokanecounty.org',
+    'https://connecttupelopolice.org',
+    'https://connectmadison.org',
+    'https://connectplaqueminesparish.org',
+    'https://connectwinterpark.org',
+    'https://connecthawthorne.org',
+    'https://cameraconnectdc.org',
+    'https://connectwintergarden.org',
+    'https://connectlakecounty.org',
+    'https://connectillinoisstatepolice.org',
+    'https://connectsouthfulton.org',
+    'https://connecthillsboroughcounty.org',
+    'https://connectstatesboro.org',
+    'https://connectsalinas.org',
+    'https://connectirving.org',
+    'https://connectnewhanoversheriff.org',
+    'https://connectmodesto.org',
+    'https://connectokaloosacounty.org',
+    'https://campbellpdconnect.org',
+    'https://amarilloconnect.org',
+    'https://connectdallas.org',
+    'https://connectroyalbahamas.org',
+    'https://connectfairfaxcounty.org/',
 ]
 
+# --- MODIFICATION ---
 # Get the directory where the script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Create a path to the root of the repository (one level up) and define the log file name.
@@ -201,30 +154,41 @@ def get_camera_stats(url):
     with sync_playwright() as p:
         browser = p.chromium.launch()
         page = browser.new_page()
-        
-        registered_cameras = 'Not Found'
-        integrated_cameras = 'Not Found'
 
         try:
             # Go to the target URL passed as an argument
             page.goto(url, timeout=60000)
 
+            # Wait for a key element to ensure the page is loaded
+            page.wait_for_selector('p:text("Registered Cameras")', timeout=30000)
+
             # Wait for 5 seconds to allow "count-up" animations to finish
-            page.wait_for_timeout(5000)
+            # page.wait_for_timeout(5000)
+            
+            # Helper to wait for the text to stabilize
+            def wait_for_stable_text(locator, stability_check_interval=500, max_retries=20):
+                prev_text = locator.inner_text()
+                retries = 0
+                while retries < max_retries:
+                    page.wait_for_timeout(stability_check_interval)
+                    current_text = locator.inner_text()
+                    if current_text == prev_text:
+                        return current_text
+                    prev_text = current_text
+                    retries += 1
+                print(f"Warning: Text did not stabilize for {locator} after {max_retries} checks.")
+                return prev_text
 
-            # Scrape the data for "Registered Cameras" if the element is visible
-            registered_text_element = page.locator('p:text("Registered Cameras")').first
-            if registered_text_element.is_visible():
-                registered_cameras = registered_text_element.locator('xpath=preceding-sibling::p[1]').inner_text()
-            else:
-                print(f"No 'Registered Cameras' element found for {url}")
+            # Scrape the data
+            registered_text_element = page.locator('p:text("Registered Cameras")')
+            # registered_cameras = registered_text_element.locator('xpath=preceding-sibling::p[1]').inner_text()
+            registered_num_locator = registered_text_element.locator('xpath=preceding-sibling::p[1]')
+            registered_cameras = wait_for_stable_text(registered_num_locator)
 
-            # Scrape the data for "Integrated Cameras" if the element is visible
-            integrated_text_element = page.locator('p:text("Integrated Cameras")').first
-            if integrated_text_element.is_visible():
-                integrated_cameras = integrated_text_element.locator('xpath=preceding-sibling::p[1]').inner_text()
-            else:
-                print(f"No 'Integrated Cameras' element found for {url}")
+            integrated_text_element = page.locator('p:text("Integrated Cameras")')
+            # integrated_cameras = integrated_text_element.locator('xpath=preceding-sibling::p[1]').inner_text()
+            integrated_num_locator = integrated_text_element.locator('xpath=preceding-sibling::p[1]')
+            integrated_cameras = wait_for_stable_text(integrated_num_locator)
 
             browser.close()
             return registered_cameras, integrated_cameras
@@ -233,7 +197,7 @@ def get_camera_stats(url):
             browser.close()
             # Log the error to the console
             print(f"An error occurred while scraping {url}: {e}")
-            return 'Error', 'Error'
+            return None, None
 
 def log_to_csv(timestamp, url, registered, integrated):
     """Appends a new row to the CSV log file."""
@@ -257,24 +221,23 @@ def log_to_csv(timestamp, url, registered, integrated):
         })
 
 if __name__ == "__main__":
-    # Use a thread pool to process URLs in parallel.
-    # The ideal number of workers can be adjusted based on system resources.
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        # Use executor.map to apply the get_camera_stats function to each URL
-        results = executor.map(get_camera_stats, URLS)
+    # Loop through each URL in the list
+    for url in URLS:
+        print(f"Scraping data from: {url}")
 
-        # Process the results as they become available
-        for url, (registered_count, integrated_count) in zip(URLS, results):
-            # Get the current timestamp
-            now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # Get the stats for the current URL
+        registered_count, integrated_count = get_camera_stats(url)
 
-            if registered_count != 'Error' and integrated_count != 'Error':
-                # Log the successful data retrieval
-                log_to_csv(now, url, registered_count, integrated_count)
-                print(f"{now} - Successfully logged data for {url}: Registered={registered_count}, Integrated={integrated_count}")
-            else:
-                # Log the failure
-                log_to_csv(now, url, 'Error', 'Error')
-                print(f"{now} - Error: Failed to retrieve camera statistics for {url}. Logged error to CSV.")
+        # Get the current timestamp
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            print("-" * 20) # Separator for clarity in console output
+        if registered_count and integrated_count:
+            # Log the successful data retrieval
+            log_to_csv(now, url, registered_count, integrated_count)
+            print(f"{now} - Successfully logged data for {url}: Registered={registered_count}, Integrated={integrated_count}")
+        else:
+            # Log the failure
+            log_to_csv(now, url, 'Error', 'Error')
+            print(f"{now} - Error: Failed to retrieve camera statistics for {url}. Logged error to CSV.")
+
+        print("-" * 20) # Separator for clarity in console output

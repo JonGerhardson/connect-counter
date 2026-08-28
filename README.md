@@ -1,1 +1,1 @@
-Data in this repo was scraped using a script I only later discovered produced inconsistent results. Leaving it up as the historical data might still be interesting to someone. I recommend instead hitting the /public/stats api on http://fususregistry.com/.  Caveat emptor 
+Data in this repo was scraped using a script I only later discovered produced inconsistent results. Leaving it up as the historical data might still be interesting to someone. I recommend instead hitting the /public/stats api on https://axoncommunityconnect.com/  Caveat emptor 

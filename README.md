@@ -1,4 +1,1 @@
-Government surveillance surveillance
-
-
-search string to find pages: "Your participation will greatly enhance emergency preparedness by enabling police, fire, and public safety professionals to better assess and rapidly respond to criminal activity and emergency situations. It will also enable investigators to easily gather evidence in case of an incident."
+Data in this repo was scraped using a script I only later discovered produced inconsistent results. Leaving it up as the historical data might still be interesting to someone. I reccomend instead hitting the /public/stats api on http://fususregistry.com/.  Caveat emptor 
